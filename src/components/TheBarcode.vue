@@ -29,10 +29,10 @@
                 </div>
             </div>
         </div>
-        <div v-if="videoAllowed" class="barcode__scanners">
-            <StreamBarcodeReader @decode="onDecode" @loaded="videoAllowed ? onLoaded : null"></StreamBarcodeReader>
+        <div v-if="scannerOpen" class="barcode__scanners">
+            <StreamBarcodeReader @decode="onDecode" @loaded="scannerOpen ? onLoaded : null"></StreamBarcodeReader>
             <!-- <ImageBarcodeReader @decode="onDecode" @error="onError"></ImageBarcodeReader> -->
-            <BaseIcon class="barcode__scanners-close-btn" icon="cancel" @click="videoAllowed = false" />
+            <BaseIcon class="barcode__scanners-close-btn" icon="cancel" @click="scannerOpen = false" />
         </div>
     </div>
 </template>
@@ -51,8 +51,7 @@ export default {
         return {
             textBarcode: "5000159384476",
             food: null,
-            videoAllowed: false,
-            videoOpen: false
+            scannerOpen: false,
         }
     },
     methods: {
@@ -62,10 +61,12 @@ export default {
                     .then((response) => response.json())
                     .then((data) => {
                         if(data.status_verbose === "product found"){
+                            this.scannerOpen = false;
                             this.food = data.product
                             console.log(this.food)
                         } else {
                             alert("Product not found :(")
+                            this.scannerOpen = false;
                         }
                     })
             }
@@ -74,7 +75,7 @@ export default {
             if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
                 console.log("Let's get this party started")
             }
-            this.videoAllowed = true;
+            this.scannerOpen = true;
         },
         onDecode (result) { 
             if(result) {
